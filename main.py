@@ -6,6 +6,7 @@ from tkinter import filedialog
 from PIL import Image, ImageTk
 import io
 import win32com.client as win32
+import re  # For regular expression to replace numbers
 
 
 # Function to extract text from a PDF
@@ -22,6 +23,11 @@ def extract_text_from_pdf(pdf_path):
     return text_blocks
 
 
+# Function to sanitize the text by replacing numbers with 'xxxx'
+def sanitize_text(text):
+    return re.sub(r'\d+', 'xxxx', text)  # Replace all numbers with 'xxxx'
+
+
 # Function to generate a thumbnail image from the first page of a PDF
 def generate_pdf_thumbnail(pdf_path):
     with fitz.open(pdf_path) as pdf:
@@ -35,8 +41,9 @@ def generate_pdf_thumbnail(pdf_path):
 
 # Function to translate text using Google Translate API (async)
 async def translate_text(text, src_lang, target_lang):
+    sanitized_text = sanitize_text(text)  # Replace numbers with 'xxxx' before translating
     translator = Translator()
-    translation = await translator.translate(text, src=src_lang, dest=target_lang)
+    translation = await translator.translate(sanitized_text, src=src_lang, dest=target_lang)
     return translation.text
 
 
